@@ -1,57 +1,29 @@
 'use strict';
+var url = require("url");
+var strftime = require("strftime");
 
-var path = process.cwd();
-var ClickHandler = require(path + '/app/controllers/clickHandler.server.js');
-
-module.exports = function (app, passport) {
-
-	function isLoggedIn (req, res, next) {
-		if (req.isAuthenticated()) {
-			return next();
-		} else {
-			res.redirect('/login');
-		}
-	}
-
-	var clickHandler = new ClickHandler();
-
-	app.route('/')
-		.get(isLoggedIn, function (req, res) {
-			res.sendFile(path + '/public/index.html');
-		});
-
-	app.route('/login')
-		.get(function (req, res) {
-			res.sendFile(path + '/public/login.html');
-		});
-
-	app.route('/logout')
-		.get(function (req, res) {
-			req.logout();
-			res.redirect('/login');
-		});
-
-	app.route('/profile')
-		.get(isLoggedIn, function (req, res) {
-			res.sendFile(path + '/public/profile.html');
-		});
-
-	app.route('/api/:id')
-		.get(isLoggedIn, function (req, res) {
-			res.json(req.user.github);
-		});
-
-	app.route('/auth/github')
-		.get(passport.authenticate('github'));
-
-	app.route('/auth/github/callback')
-		.get(passport.authenticate('github', {
-			successRedirect: '/',
-			failureRedirect: '/login'
-		}));
-
-	app.route('/api/:id/clicks')
-		.get(isLoggedIn, clickHandler.getClicks)
-		.post(isLoggedIn, clickHandler.addClick)
-		.delete(isLoggedIn, clickHandler.resetClicks);
+module.exports = function (app) {
+    app.route('/')
+        .get(function (req, res) {
+            res.sendFile(process.cwd() + '/public/index.html'); });
+            
+    app.route('/:date/')
+        .get(function(req, res){
+            var unixTime = null;
+            var standardTime = null;
+            
+            if(!isNaN(req.params.date))
+            {
+                standardTime = strftime('%B %d, %Y', new Date(req.params.date * 1000));
+                unixTime = parseInt(req.params.date);
+                
+            }
+            else if(!isNaN(Date.parse(req.params.date.replace("%20", " "))))
+            {
+                unixTime = Date.parse(req.params.date.replace("%20", " "))/1000;
+                standardTime = req.params.date;
+            }
+            
+            res.send({"unix": unixTime, "natural": standardTime}); 
+        });
 };
