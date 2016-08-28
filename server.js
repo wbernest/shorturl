@@ -7,7 +7,7 @@ var express = require('express'),
 
 var app = express();
 
-mongo.connect('mongodb://localhost:27017/timestamp', function (err, db) {
+mongo.connect('mongodb://localhost:27017/shorturl', function (err, db) {
 
     if (err) {
         throw new Error('Database failed to connect!');

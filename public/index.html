@@ -7,20 +7,18 @@
     </head>
     <body>
         <div class="container">
-            <h1 class="header">
-                Timestamp microservice
-            </h1>
-           
-            <h3>Example usage:</h3>
-            <code>https://timestamp-basejump-wbernest.c9users.io/December%2015,%202015</code><br>
-            <code>https://timestamp-basejump-wbernest.c9users.io/1450137600</code>
-            <h3>Example output:</h3>
-            <code>
-                {
-                  "unix": 1450137600,
-                  "natural": "December 15, 2015"
-                }
-            </code>
+            <h1 class="header">URL Shortener Microservice</h1>
+            
+            <h3>Example creation usage:</h3>
+            <code>https://urlshortener-basejump-wbernest.c9users.io/new/https://www.google.com</code>
+            <br/>
+            <code>https://urlshortener-basejump-wbernest.c9users.io/new/http://foo.com:80</code>
+            <h3>Example creation output</h3>
+            <code>{ "original_url":"http://foo.com:80",  "short_url":"https://little-url.herokuapp.com/8170" }</code>
+            <h3>Usage:</h3>
+            <code>https://urlshortener-basejump-wbernest.c9users.io/5</code>
+            <h3>Will redirect to:</h3>
+            <code>https://www.google.com/</code>
         </div>
     </body>
 </html>

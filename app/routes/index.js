@@ -1,29 +1,38 @@
 'use strict';
-var url = require("url");
-var strftime = require("strftime");
+var validUrl = require("valid-url");
+var SiteHandler = require(process.cwd() + "/app/controllers/addSiteHandler.server.js");
 
-module.exports = function (app) {
+module.exports = function (app, db) {
+    
+    var siteHandler = new SiteHandler(db);
+    
     app.route('/')
         .get(function (req, res) {
             res.sendFile(process.cwd() + '/public/index.html'); });
-            
-    app.route('/:date/')
-        .get(function(req, res){
-            var unixTime = null;
-            var standardTime = null;
-            
-            if(!isNaN(req.params.date))
-            {
-                standardTime = strftime('%B %d, %Y', new Date(req.params.date * 1000));
-                unixTime = parseInt(req.params.date);
-                
-            }
-            else if(!isNaN(Date.parse(req.params.date.replace("%20", " "))))
-            {
-                unixTime = Date.parse(req.params.date.replace("%20", " "))/1000;
-                standardTime = req.params.date;
-            }
-            
-            res.send({"unix": unixTime, "natural": standardTime}); 
+    
+    app.route('/:url')
+        .get(function(req, res) {
+            siteHandler.goToSite(res, req.params.url);
         });
+        
+    app.route('/new/:url')
+        .get(function (req, res){
+            res.send({"error": "Wrong url format, make sure you have a valid protocol and a real site."});
+        });
+    
+    app.route('/new/http://:url')
+        .get(function (req, res){
+            if(!validUrl.isUri("http://" + req.params.url))
+                res.send({"error": "Wrong url format, make sure you have a valid protocol and a real site."});
+                
+            siteHandler.addSite(res, "http://" + req.params.url);
+        });
+
+    app.route('/new/https://:url')
+        .get(function (req, res){
+            if(!validUrl.isUri("https://" + req.params.url))
+                res.send({"error": "Wrong url format, make sure you have a valid protocol and a real site."});
+            siteHandler.addSite(res, "https://" + req.params.url);
+        });
+
 };
